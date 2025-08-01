@@ -1,18 +1,21 @@
 package com.crud.crud_lombok_dto.service.impl;
 
 import com.crud.crud_lombok_dto.dto.UserDto;
+import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.model.User;
 import com.crud.crud_lombok_dto.repository.UserRepository;
 import com.crud.crud_lombok_dto.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
@@ -82,6 +85,31 @@ public class UserServiceImpl implements UserService {
         }
         User user = optionalUser.get();
         return user.getPassword().equals(password);
+    }
+
+    @Override
+    public UserResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+
+        Sort sort = null;
+        if(sortDir.equals("asc")){
+            sort = Sort.by(sortBy).ascending();
+        }else{
+            sort = Sort.by(sortBy).descending();
+        }
+
+        Pageable p = PageRequest.of(pageNumber, pageSize, sort); // Asc or Desc choose based on requirement
+        Page<User> userPost = this.repository.findAll(p);
+        List<User> allUsers = userPost.getContent();
+        List<UserDto> users = allUsers.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
+        UserResponse userResponse = new UserResponse();
+        userResponse.setTotalElements(userPost.getTotalElements());
+        userResponse.setTotalPage(userPost.getTotalPages());
+        userResponse.setLastPage(userPost.isLast());
+        userResponse.setContent(users);
+        userResponse.setPageNumber(userPost.getNumber());
+        userResponse.setPageSize(userPost.getSize());
+
+        return userResponse;
     }
 }
 
