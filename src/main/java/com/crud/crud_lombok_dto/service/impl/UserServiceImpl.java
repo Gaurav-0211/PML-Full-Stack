@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -68,6 +71,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()->new RuntimeException("User not found"));
         log.info("Delete use in Impl");
         this.repository.delete(user);
+    }
+
+    @Override
+    public boolean validateUser(String email, String password) {
+
+        Optional<User> optionalUser = repository.findByEmail(email);
+        if(optionalUser.isEmpty()){
+            return false;
+        }
+        User user = optionalUser.get();
+        return user.getPassword().equals(password);
     }
 }
 

@@ -1,4 +1,5 @@
 package com.crud.crud_lombok_dto.controller;
+import com.crud.crud_lombok_dto.dto.LoginRequest;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +26,19 @@ public class UserController {
             return new ResponseEntity<>(service.createUser(userdto), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        log.info("Login API called");
+
+        boolean isValid = service.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
+
+        if (isValid) {
+            return ResponseEntity.ok("Login successful!");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
     }
 
