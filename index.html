@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Registration</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <div class="toggle">
+          <button id="show-login">Login</button>
+          <button id="show-register">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="form hidden">
+          <h2>Login</h2>
+          <input type="email" id="login-email" placeholder="Email" required />
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Password"
+            required
+          />
+          <canvas id="login-captcha-canvas" width="150" height="40"></canvas>
+          <input
+            type="text"
+            id="login-captcha-input"
+            placeholder="Enter CAPTCHA"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+
+        <!-- Registration Form -->
+        <form id="register-form" class="form hidden">
+          <form id="register-form" class="form hidden">
+            <h2>Register</h2>
+            <input
+              type="text"
+              id="register-name"
+              placeholder="Enter Full Name"
+              required
+            />
+            <input
+              type="email"
+              id="register-email"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              id="register-password"
+              placeholder="Password"
+              required
+            />
+            <input
+              type="password"
+              id="register-confirm-password"
+              placeholder="Confirm Password"
+              required
+            />
+            <canvas
+              id="register-captcha-canvas"
+              width="150"
+              height="40"
+            ></canvas>
+            <input
+              type="text"
+              id="register-captcha-input"
+              placeholder="Enter CAPTCHA"
+              required
+            />
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

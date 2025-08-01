@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - Home</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header>
+        <h1>Welcome to Your Home Page</h1>
+        <button id="logout-btn">Logout</button>
+      </header>
+
+      <main>
+        <p>You have successfully logged in or registered 🎉</p>
+
+        <div class="info-box">
+          <h2>User Info (Coming Soon)</h2>
+          <p>
+            Welcome to your dashboard! Here you will find your user information,
+            settings, and other personalized content. Stay tuned for updates!
+          </p>
+        </div>
+      </main>
+
+      <footer>
+        <p>&copy; 2025 Gaurav Kumar. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        alert("You have been successfully logged out.");
+        window.location.href = "index.html";
+      });
+    </script>
+  </body>
+</html>
