@@ -2,10 +2,29 @@ package com.crud.crud_lombok_dto.repository;
 
 import com.crud.crud_lombok_dto.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.util.Streamable;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
-
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
+
     Optional<User> findByEmail(String email);
+
+    User findByName(String name);
+
+    List<User> findByNameLike(String name);
+
+    List<User> findByNameStartsWith(String name);
+
+    List<User> findByNameEndingWith(String name);
+
+    Streamable<User> findAllByOrderByNameDesc();
+
+    List<User> findAllByRegistrationDateBefore(LocalDate before);
+
+    List<User> findAllByRegistrationAfter(LocalDate after);
 }
