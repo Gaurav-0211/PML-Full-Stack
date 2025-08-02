@@ -27,4 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByRegistrationDateBefore(LocalDate before);
 
     List<User> findAllByRegistrationAfter(LocalDate after);
+
 }
