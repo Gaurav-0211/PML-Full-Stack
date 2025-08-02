@@ -1,6 +1,8 @@
 package com.crud.crud_lombok_dto.controller;
+import com.crud.crud_lombok_dto.config.AppConstants;
 import com.crud.crud_lombok_dto.dto.LoginRequest;
 import com.crud.crud_lombok_dto.dto.UserDto;
+import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -85,4 +87,16 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<UserResponse> getAll(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
+            @RequestParam (value = "sortDir", defaultValue = AppConstants.SORT_DIR,required = false) String sortDir)
+    {
+        UserResponse users = this.service.getAllPost(pageNumber, pageSize,sortBy, sortDir);
+        return ResponseEntity.ok(users);
+    }
+
 }
