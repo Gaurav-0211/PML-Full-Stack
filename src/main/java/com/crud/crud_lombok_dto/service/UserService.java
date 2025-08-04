@@ -2,9 +2,7 @@ package com.crud.crud_lombok_dto.service;
 
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
-import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserService {

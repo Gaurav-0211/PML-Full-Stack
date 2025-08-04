@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +41,8 @@ public class UserServiceImpl implements UserService {
         log.info("Impl create User called ");
 
         User user = this.mapper.map(userDto,User.class);
+
+        // Optional if applicable
         this.repository.save(user);
         UserDto userDto1 = this.mapper.map(user,UserDto.class);
 
