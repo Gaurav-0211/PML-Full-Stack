@@ -99,4 +99,40 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/by-name")
+    public ResponseEntity<List<UserDto>> getByName(@RequestParam String name){
+        List<UserDto> allUser = this.service.getAllUserByName(name);
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-date")
+    public ResponseEntity<List<UserDto>> getByDate(){
+        log.info("Get By Date API in controller");
+        List<UserDto> allUser = this.service.getAllUserByUpdatedDate();
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-start-name")
+    public ResponseEntity<List<UserDto>> getByNameStart(@RequestParam String name){
+        log.info("Get By Start Name Api in controller");
+        List<UserDto> allUser = this.service.getAllNameStartWith(name);
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/by-end-name")
+    public ResponseEntity<List<UserDto>> getByNameEnd(@RequestParam String name){
+        log.info("Get By End Name Api in controller");
+        List<UserDto> allUser = this.service.getAllNameEndWith(name);
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/orderBy-name")
+    public ResponseEntity<List<UserDto>> getNameDesc(){
+        List<UserDto> allUser = this.service.getAllNameDesc();
+        return new ResponseEntity<>(allUser,HttpStatus.OK);
+    }
+
+
+
 }
