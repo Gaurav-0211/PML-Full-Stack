@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 @Repository
@@ -24,8 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Streamable<User> findAllByOrderByNameDesc();
 
-    List<User> findAllByRegistrationDateBefore(LocalDate before);
+    List<User> findAllByCreatedAtBefore(LocalDateTime before);
 
-    List<User> findAllByRegistrationAfter(LocalDate after);
+    List<User> findAllByCreatedAtAfter(LocalDateTime after);
 
 }

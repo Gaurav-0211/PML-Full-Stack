@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
         log.info("Impl create User called ");
 
         User user = this.mapper.map(userDto,User.class);
-        user.setPassword(userDto.getPassword());
         this.repository.save(user);
         UserDto userDto1 = this.mapper.map(user,UserDto.class);
 
