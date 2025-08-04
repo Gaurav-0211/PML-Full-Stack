@@ -50,7 +50,7 @@ public class UserController {
             List<UserDto> dto = this.service.getAllUsers();
             log.info("Get all Called in Controller");
             return new ResponseEntity<List<UserDto>>(dto, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e){
             return new  ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
