@@ -15,9 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -140,6 +137,24 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
         return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getAllNameEndWith(String name) {
+        List<User> users = this.repository.findByNameEndingWith(name);
+        if(users.isEmpty()){
+            throw new RuntimeException("User Not found");
+        }
+        return users.stream().map((user)-> this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getAllNameDesc() {
+        List<User> users = this.repository.findAllByOrderByNameDesc();
+        if(users.isEmpty()){
+            throw new RuntimeException("Name not sorted");
+        }
+        return users.stream().map((user)-> this.mapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
 }
 

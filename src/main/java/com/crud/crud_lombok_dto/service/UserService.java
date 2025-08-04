@@ -24,5 +24,9 @@ public interface UserService {
 
     List<UserDto> getAllNameStartWith(String name);
 
+    List<UserDto> getAllNameEndWith(String name);
+
+    List<UserDto> getAllNameDesc();
+
 
 }

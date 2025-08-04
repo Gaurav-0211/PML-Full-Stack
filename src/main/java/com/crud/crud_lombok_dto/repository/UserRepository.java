@@ -16,13 +16,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByName(String name);
 
-    List<User> findByNameLike(String name);
 
     List<User> findByNameStartsWith(String name);
 
     List<User> findByNameEndingWith(String name);
 
-    Streamable<User> findAllByOrderByNameDesc();
+    List<User> findAllByOrderByNameDesc();
 
     List<User> findAllByOrderByUpdatedAtDesc();
 

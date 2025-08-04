@@ -114,10 +114,25 @@ public class UserController {
 
     @GetMapping("/by-start-name")
     public ResponseEntity<List<UserDto>> getByNameStart(@RequestParam String name){
-        log.info("Get By Name Api in controller");
+        log.info("Get By Start Name Api in controller");
         List<UserDto> allUser = this.service.getAllNameStartWith(name);
         return new ResponseEntity<>(allUser, HttpStatus.OK);
     }
+
+
+    @GetMapping("/by-end-name")
+    public ResponseEntity<List<UserDto>> getByNameEnd(@RequestParam String name){
+        log.info("Get By End Name Api in controller");
+        List<UserDto> allUser = this.service.getAllNameEndWith(name);
+        return new ResponseEntity<>(allUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/orderBy-name")
+    public ResponseEntity<List<UserDto>> getNameDesc(){
+        List<UserDto> allUser = this.service.getAllNameDesc();
+        return new ResponseEntity<>(allUser,HttpStatus.OK);
+    }
+
 
 
 }
