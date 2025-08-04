@@ -15,6 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,6 +113,33 @@ public class UserServiceImpl implements UserService {
         userResponse.setPageSize(userPost.getSize());
 
         return userResponse;
+    }
+
+    @Override
+    public List<UserDto> getAllUserByName(String name) {
+        List<User> users = this.repository.findByName(name);
+        if (users.isEmpty()){
+            throw  new RuntimeException("User not found with given name");
+        }
+        return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getAllUserByUpdatedDate() {
+        List<User> users = this.repository.findAllByOrderByUpdatedAtDesc();
+        if(users.isEmpty()){
+            throw new RuntimeException("User not found at given date and time");
+        }
+        return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getAllNameStartWith(String name) {
+        List<User> users = this.repository.findByNameStartsWith(name);
+        if(users.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
 }
 

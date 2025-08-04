@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    User findByName(String name);
+    List<User> findByName(String name);
 
     List<User> findByNameLike(String name);
 
@@ -24,8 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Streamable<User> findAllByOrderByNameDesc();
 
-    List<User> findAllByCreatedAtBefore(LocalDateTime before);
+    List<User> findAllByOrderByUpdatedAtDesc();
 
-    List<User> findAllByCreatedAtAfter(LocalDateTime after);
 
 }
