@@ -1,5 +1,6 @@
 package com.crud.crud_lombok_dto.service;
 
+import com.crud.crud_lombok_dto.dto.EmailEntity1;
 import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
@@ -28,6 +29,8 @@ public interface UserService {
     List<UserDto> getAllNameDesc();
 
     public void sendEmail(MailEntity mailEntity);
+
+    public void sendMailToAllUsers(EmailEntity1 emailEntity1);
 
 
 }

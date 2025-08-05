@@ -1,9 +1,6 @@
 package com.crud.crud_lombok_dto.controller;
 import com.crud.crud_lombok_dto.config.AppConstants;
-import com.crud.crud_lombok_dto.dto.LoginRequest;
-import com.crud.crud_lombok_dto.dto.MailEntity;
-import com.crud.crud_lombok_dto.dto.UserDto;
-import com.crud.crud_lombok_dto.dto.UserResponse;
+import com.crud.crud_lombok_dto.dto.*;
 import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -140,6 +137,12 @@ public class UserController {
         return new ResponseEntity<String>("Sent Successful",HttpStatus.OK);
     }
 
+
+    @PostMapping("/send-to-all")
+    public ResponseEntity<String> sendMailToAll(@RequestBody EmailEntity1 emailEntity1) {
+        service.sendMailToAllUsers(emailEntity1);
+        return ResponseEntity.ok("Email sent to all users successfully!");
+    }
 
 
 }
