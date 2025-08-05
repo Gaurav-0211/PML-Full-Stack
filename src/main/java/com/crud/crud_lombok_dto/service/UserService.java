@@ -1,5 +1,6 @@
 package com.crud.crud_lombok_dto.service;
 
+import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
 
@@ -11,7 +12,7 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
     UserDto updateUser(Long id, UserDto userDto);
-    void deleteUser(Long id);
+    void deleteUser(long id);
     boolean validateUser(String email, String password);
 
     UserResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
@@ -25,6 +26,8 @@ public interface UserService {
     List<UserDto> getAllNameEndWith(String name);
 
     List<UserDto> getAllNameDesc();
+
+    public void sendEmail(MailEntity mailEntity);
 
 
 }
