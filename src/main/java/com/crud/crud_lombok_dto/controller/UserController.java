@@ -1,6 +1,7 @@
 package com.crud.crud_lombok_dto.controller;
 import com.crud.crud_lombok_dto.config.AppConstants;
 import com.crud.crud_lombok_dto.dto.LoginRequest;
+import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.service.UserService;
@@ -131,6 +132,12 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getNameDesc(){
         List<UserDto> allUser = this.service.getAllNameDesc();
         return new ResponseEntity<>(allUser,HttpStatus.OK);
+    }
+
+    @PostMapping("/send-mail")
+    public ResponseEntity<String> sendMail(@RequestBody MailEntity mailEntity){
+        this.service.sendEmail(mailEntity);
+        return new ResponseEntity<String>("Sent Successful",HttpStatus.OK);
     }
 
 

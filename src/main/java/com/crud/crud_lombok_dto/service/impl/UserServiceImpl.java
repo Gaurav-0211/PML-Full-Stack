@@ -1,5 +1,6 @@
 package com.crud.crud_lombok_dto.service.impl;
 
+import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.model.User;
@@ -8,10 +9,14 @@ import com.crud.crud_lombok_dto.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -31,6 +36,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    //public int x = 20;
 
 
     public UserDto createUser(UserDto userDto) {
@@ -72,12 +82,15 @@ public class UserServiceImpl implements UserService {
         user.setPassword(userDetails.getPassword());
         return this.mapper.map(user,UserDto.class);
     }
+    //@Scheduled(cron = "*/5 * * * *")
+    //@Scheduled(cron = "0 * * * * *")
+    public void deleteUser(long id) {
 
-    public void deleteUser(Long id) {
         User user = this.repository.findById(id)
                 .orElseThrow(()->new RuntimeException("User not found"));
         log.info("Delete use in Impl");
         this.repository.delete(user);
+        //x = x-1;
     }
 
     @Override
@@ -160,5 +173,22 @@ public class UserServiceImpl implements UserService {
         }
         return users.stream().map((user)-> this.mapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
+
+    @Value("$(spring.mail.username)")
+    private String fromEmailId;
+
+
+    @Override
+    public void sendEmail(MailEntity mailEntity){
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(fromEmailId);
+        mailMessage.setTo(mailEntity.getRecipient());
+        mailMessage.setText(mailEntity.getBody());
+        mailMessage.setSubject(mailEntity.getSubject());
+
+        javaMailSender.send(mailMessage);
+    }
+
 }
 
