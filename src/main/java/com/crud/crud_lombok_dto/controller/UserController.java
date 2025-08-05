@@ -22,6 +22,7 @@ public class UserController {
     private UserService service;
 
 
+
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userdto){
         log.info("Register Api called in Controller");
@@ -138,6 +139,19 @@ public class UserController {
     public ResponseEntity<String> sendMail(@RequestBody MailEntity mailEntity){
         this.service.sendEmail(mailEntity);
         return new ResponseEntity<String>("Sent Successful",HttpStatus.OK);
+    }
+
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOtp(@RequestParam String toPhoneNumber) {
+        String otp = service.generateOtp();
+        boolean isSent = service.sendOtp(toPhoneNumber, otp);
+
+        if (isSent) {
+            return ResponseEntity.ok("OTP sent successfully to WhatsApp number: " + toPhoneNumber);
+        } else {
+            return ResponseEntity.status(500).body("Failed to send OTP");
+        }
     }
 
 

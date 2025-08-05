@@ -6,6 +6,8 @@ import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.model.User;
 import com.crud.crud_lombok_dto.repository.UserRepository;
 import com.crud.crud_lombok_dto.service.UserService;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -181,6 +184,29 @@ public class UserServiceImpl implements UserService {
         mailMessage.setSubject(mailEntity.getSubject());
 
         javaMailSender.send(mailMessage);
+    }
+
+    @Value("${twilio.from.number}")
+    private String fromNumber;
+
+    public String generateOtp() {
+        return String.valueOf(100000 + new Random().nextInt(900000));
+    }
+
+    public boolean sendOtp(String toNumber, String otp) {
+        try {
+            Message message = Message.creator(
+                    new PhoneNumber("whatsapp:" + toNumber), // recipient
+                    new PhoneNumber(fromNumber),   // Sender
+                    "Your OTP is: " + otp + " (valid for 5 minutes)"
+            ).create();
+
+            System.out.println("Message SID: " + message.getSid());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

@@ -29,5 +29,9 @@ public interface UserService {
 
     public void sendEmail(MailEntity mailEntity);
 
+    public String generateOtp();
+
+    public boolean sendOtp(String toNumber, String otp);
+
 
 }
