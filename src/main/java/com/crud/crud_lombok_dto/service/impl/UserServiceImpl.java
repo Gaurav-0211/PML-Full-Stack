@@ -16,13 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,7 +36,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    //public int x = 20;
 
 
     public UserDto createUser(UserDto userDto) {
@@ -52,7 +47,6 @@ public class UserServiceImpl implements UserService {
 
         User user = this.mapper.map(userDto,User.class);
 
-        // Optional if applicable
         this.repository.save(user);
         UserDto userDto1 = this.mapper.map(user,UserDto.class);
 
@@ -90,7 +84,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()->new RuntimeException("User not found"));
         log.info("Delete use in Impl");
         this.repository.delete(user);
-        //x = x-1;
     }
 
     @Override
