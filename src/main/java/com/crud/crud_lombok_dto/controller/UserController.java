@@ -23,11 +23,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userdto){
         log.info("Register Api called in Controller");
-        try {
-            return new ResponseEntity<>(service.createUser(userdto), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        UserDto dto = this.service.createUser(userdto);
+        return new ResponseEntity<UserDto>(dto, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

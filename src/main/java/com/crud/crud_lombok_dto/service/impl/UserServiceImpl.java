@@ -84,6 +84,7 @@ public class UserServiceImpl implements UserService {
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
+        this.repository.save(user);
         return this.mapper.map(user,UserDto.class);
     }
     //@Scheduled(cron = "*/5 * * * *")
