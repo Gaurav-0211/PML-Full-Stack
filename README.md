@@ -33,6 +33,12 @@
 
 ---
 
+## 🗂 Send Otp on WhatsApp API Implemented
+<img width="1162" height="132" alt="Screenshot 2025-08-05 162447" src="https://github.com/user-attachments/assets/11929622-e365-4f93-a2dd-2aeddd8c2cb9" />
+
+## 🗂 Email triggering API Implemented
+<img width="653" height="415" alt="Screenshot 2025-08-06 163555" src="https://github.com/user-attachments/assets/6a0e8f67-2554-41f5-83b1-bda71cdaecef" />
+
 ## 🗂️ Project 
 <img width="492" height="555" alt="Screenshot 2025-08-01 154739" src="https://github.com/user-attachments/assets/f01a86e5-f1c4-475a-af86-f41b58a207ed" />
 <img width="492" height="691" alt="Screenshot 2025-08-01 154843" src="https://github.com/user-attachments/assets/3ad81579-da6f-41a3-9e7e-30faa7cbf134" />
