@@ -1,9 +1,6 @@
 package com.crud.crud_lombok_dto.controller;
 import com.crud.crud_lombok_dto.config.AppConstants;
-import com.crud.crud_lombok_dto.dto.LoginRequest;
-import com.crud.crud_lombok_dto.dto.MailEntity;
-import com.crud.crud_lombok_dto.dto.UserDto;
-import com.crud.crud_lombok_dto.dto.UserResponse;
+import com.crud.crud_lombok_dto.dto.*;
 import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +59,7 @@ public class UserController {
         try {
             UserDto dto = service.getUserById(id);
             log.info("Get by Id called in controller");
-            return new ResponseEntity<>(dto, HttpStatus.OK);
+            return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -153,7 +150,6 @@ public class UserController {
             return ResponseEntity.status(500).body("Failed to send OTP");
         }
     }
-
 
 
 }

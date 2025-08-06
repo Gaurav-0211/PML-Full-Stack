@@ -3,6 +3,9 @@ package com.crud.crud_lombok_dto.service.impl;
 import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
+import com.crud.crud_lombok_dto.exception.NoSuchUserExistException;
+import com.crud.crud_lombok_dto.exception.NoUserExist;
+import com.crud.crud_lombok_dto.exception.UserAlreadyExistException;
 import com.crud.crud_lombok_dto.model.User;
 import com.crud.crud_lombok_dto.repository.UserRepository;
 import com.crud.crud_lombok_dto.service.UserService;
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
 
         if(this.repository.existsByEmail(userDto.getEmail())){
-            throw new RuntimeException("Email already exist!");
+            throw new UserAlreadyExistException("User already exist with email"+userDto.getEmail());
         }
         log.info("Impl create User called ");
 
@@ -58,21 +61,25 @@ public class UserServiceImpl implements UserService {
 
     public List<UserDto> getAllUsers() {
         List<User> users =  this.repository.findAll();
+        if(users.isEmpty()){
+            throw new NoUserExist("User List is empty No user has registered yet!");
+        }
         log.info("Get all user in Impl");
         return users.stream().map((user)->this.mapper.map(user, UserDto.class)).collect(Collectors.toList());
 
     }
 
     public UserDto getUserById(Long id) {
-        User user =  repository.findById(id)
-                .orElseThrow(()-> new RuntimeException("User not exist"));
+        User user =  this.repository.findById(id)
+                        .orElseThrow(() -> new NoSuchUserExistException("User not exist with id :"+id));
+
         log.info("get user by id in Impl");
         return this.mapper.map(user, UserDto.class);
     }
 
     public UserDto updateUser(Long id, UserDto userDetails) {
         User user = this.repository.findById(id)
-                .orElseThrow(()->new RuntimeException("User Not found "));
+                .orElseThrow(()->new NoSuchUserExistException("No user exist with id :"+id));
         log.info("Update user in Impl");
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
@@ -84,7 +91,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(long id) {
 
         User user = this.repository.findById(id)
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(()->new NoSuchUserExistException("No User exist with id :"+id));
         log.info("Delete use in Impl");
         this.repository.delete(user);
     }
@@ -129,7 +136,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUserByName(String name) {
         List<User> users = this.repository.findByName(name);
         if (users.isEmpty()){
-            throw  new RuntimeException("User not found with given name");
+            throw  new NoSuchUserExistException("No user exist with name :"+name);
         }
         return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
@@ -138,7 +145,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUserByUpdatedDate() {
         List<User> users = this.repository.findAllByOrderByUpdatedAtDesc();
         if(users.isEmpty()){
-            throw new RuntimeException("User not found at given date and time");
+            throw new NoUserExist("No user exist List is empty no user has registered yet !");
         }
         return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
@@ -147,7 +154,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllNameStartWith(String name) {
         List<User> users = this.repository.findByNameStartsWith(name);
         if(users.isEmpty()){
-            throw new RuntimeException("User not found");
+            throw new NoSuchUserExistException("No user exist with name start with :"+name);
         }
         return users.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
@@ -156,7 +163,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllNameEndWith(String name) {
         List<User> users = this.repository.findByNameEndingWith(name);
         if(users.isEmpty()){
-            throw new RuntimeException("User Not found");
+            throw new NoSuchUserExistException("No user exist with name end with :"+name);
         }
         return users.stream().map((user)-> this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
@@ -165,7 +172,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllNameDesc() {
         List<User> users = this.repository.findAllByOrderByNameDesc();
         if(users.isEmpty()){
-            throw new RuntimeException("Name not sorted");
+            throw new NoUserExist("User List is Empty No user has registered yet!");
         }
         return users.stream().map((user)-> this.mapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
