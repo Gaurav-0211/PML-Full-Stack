@@ -42,46 +42,30 @@ public class UserController {
 
     @GetMapping("/get-all")
     public ResponseEntity<List<UserDto>> getAllUsers() {
-        try {
-            List<UserDto> dto = this.service.getAllUsers();
-            log.info("Get all Called in Controller");
-            return new ResponseEntity<List<UserDto>>(dto, HttpStatus.OK);
-        } catch (Exception e){
-            return new  ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        List<UserDto> dto = this.service.getAllUsers();
+        log.info("Get all Called in Controller");
+        return new ResponseEntity<List<UserDto>>(dto, HttpStatus.OK);
+
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        try {
-            UserDto dto = service.getUserById(id);
-            log.info("Get by Id called in controller");
-            return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        UserDto dto = this.service.getUserById(id);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto user) {
-        try {
-            UserDto userDto = service.updateUser(id,user);
-            log.info("Update Put called in controller");
-            return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<UserDto>(HttpStatus.BAD_REQUEST);
-        }
+        UserDto userDto = service.updateUser(id,user);
+        log.info("Update Put called in controller");
+        return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
             service.deleteUser(id);
             log.info("Delete called in controller");
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping

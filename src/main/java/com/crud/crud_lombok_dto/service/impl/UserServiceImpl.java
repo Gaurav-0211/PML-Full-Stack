@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
 
         if(this.repository.existsByEmail(userDto.getEmail())){
-            throw new UserAlreadyExistException("User already exist with email"+userDto.getEmail());
+            throw new UserAlreadyExistException("User already exist with email : "+userDto.getEmail());
         }
         log.info("Impl create User called ");
 
