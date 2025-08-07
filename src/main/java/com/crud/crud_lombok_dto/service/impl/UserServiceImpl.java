@@ -110,28 +110,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir != null && sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-        Sort sort = null;
-        if(sortDir.equals("asc")){
-            sort = Sort.by(sortBy).ascending();
-        }else{
-            sort = Sort.by(sortBy).descending();
-        }
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<User> userPage = repository.findAll(pageable);
 
-        Pageable p = PageRequest.of(pageNumber, pageSize, sort); // Asc or Desc choose based on requirement
-        Page<User> userPost = this.repository.findAll(p);
-        List<User> allUsers = userPost.getContent();
-        List<UserDto> users = allUsers.stream().map((user)->this.mapper.map(user,UserDto.class)).collect(Collectors.toList());
-        UserResponse userResponse = new UserResponse();
-        userResponse.setTotalElements(userPost.getTotalElements());
-        userResponse.setTotalPage(userPost.getTotalPages());
-        userResponse.setLastPage(userPost.isLast());
-        userResponse.setContent(users);
-        userResponse.setPageNumber(userPost.getNumber());
-        userResponse.setPageSize(userPost.getSize());
+        List<UserDto> userDtos = userPage
+                .getContent()
+                .stream()
+                .map(user -> mapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
 
-        return userResponse;
+        return UserResponse.builder()
+                .content(userDtos)
+                .pageNumber(userPage.getNumber())
+                .pageSize(userPage.getSize())
+                .totalElements(userPage.getTotalElements())
+                .totalPage(userPage.getTotalPages())
+                .lastPage(userPage.isLast())
+                .build();
     }
+
 
     @Override
     public List<UserDto> getAllUserByName(String name) {
