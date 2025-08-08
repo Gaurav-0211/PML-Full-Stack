@@ -42,8 +42,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-
-
     public UserDto createUser(UserDto userDto) {
 
         if(this.repository.existsByEmail(userDto.getEmail())){

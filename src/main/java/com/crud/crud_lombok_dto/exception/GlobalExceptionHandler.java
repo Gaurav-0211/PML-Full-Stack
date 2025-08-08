@@ -1,9 +1,8 @@
 package com.crud.crud_lombok_dto.exception;
 
 import com.crud.crud_lombok_dto.config.AppConstants;
-import com.crud.crud_lombok_dto.dto.BaseResponse;
+import com.crud.crud_lombok_dto.dto.Response;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,78 +16,68 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchUserExistException.class)
-    public ResponseEntity<BaseResponse> handleNoSuchUserExistException(
-            NoSuchUserExistException ex, HttpServletRequest request) {
-
-        BaseResponse apiResponse = new BaseResponse(
-                ex.getMessage(),
+    public ResponseEntity<Response> handleNoSuchUserExistException(NoSuchUserExistException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
                 "FAILED",
+                ex.getMessage(),
+                null,
                 AppConstants.NOT_FOUND,
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                request.getRequestURI()
+                "Request not found"
         );
-
-        return new ResponseEntity<>(apiResponse, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
     }
 
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<BaseResponse> handleUserAlreadyExistException(
-            UserAlreadyExistException ex, HttpServletRequest request) {
-
-        BaseResponse apiResponse = new BaseResponse(
-                ex.getMessage(),
+    public ResponseEntity<Response> handleUserAlreadyExistException(UserAlreadyExistException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
                 "FAILED",
+                ex.getMessage(),
+                null,
                 AppConstants.CONFLICT,
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                request.getRequestURI()
+                "User Already Exist with this Id"
         );
-
-        return new ResponseEntity<>(apiResponse, HttpStatusCode.valueOf(AppConstants.CONFLICT));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.CONFLICT));
     }
-
 
     @ExceptionHandler(NoUserExist.class)
-    public ResponseEntity<BaseResponse> handleNoUserExistException(NoUserExist ex, HttpServletRequest request) {
-        BaseResponse apiResponse = new BaseResponse(
-                ex.getMessage(),
+    public ResponseEntity<Response> handleNoUserExistException(NoUserExist ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
                 "FAILED",
+                ex.getMessage(),
+                null,
                 AppConstants.NOT_FOUND,
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                request.getRequestURI()
+                "User Not Found With this Id"
         );
-        return new ResponseEntity<>(apiResponse, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
     }
 
-
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<BaseResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
-        BaseResponse apiResponse = new BaseResponse(
-                "Request method not supported",
+    public ResponseEntity<Response> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
                 "FAILED",
+                "Request method not supported",
+                null,
                 AppConstants.METHOD_NOT_ALLOWED,
-                HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),
-                request.getRequestURI()
+                "Unsuccessful Request"
         );
-        return new ResponseEntity<>(apiResponse, HttpStatusCode.valueOf(AppConstants.METHOD_NOT_ALLOWED));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.METHOD_NOT_ALLOWED));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<Response> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String errorMessages = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        BaseResponse apiResponse = new BaseResponse(
-                errorMessages,
+        Response response = Response.buildResponse(
                 "FAILED",
+                errorMessages,
+                null,
                 AppConstants.BAD_REQUEST,
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                request.getRequestURI()
+                "Data Insufficient For the Request"
         );
-
-        return new ResponseEntity<>(apiResponse, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
     }
-
 }

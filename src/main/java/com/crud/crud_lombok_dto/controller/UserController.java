@@ -5,7 +5,6 @@ import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,114 +19,245 @@ public class UserController {
     private UserService service;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userdto){
+    public ResponseEntity<Response> createUser(@RequestBody @Valid UserDto userdto){
         log.info("Register Api called in Controller");
         UserDto dto = this.service.createUser(userdto);
-        return new ResponseEntity<UserDto>(dto,HttpStatusCode.valueOf(AppConstants.CREATED));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User Registered successfully",
+                dto,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         log.info("Login API called");
 
         boolean isValid = service.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         if (isValid) {
-            return ResponseEntity.ok("Login successful!");
+            Response response = Response.buildResponse(
+                    "SUCCESS",
+                    "User Login successfully",
+                    null,
+                    AppConstants.OK,
+                    "Request Processes Successfully"
+
+            );
+
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(AppConstants.UNAUTHORISED).body("Invalid credentials.");
+
+            Response response = Response.buildResponse(
+                    "FAILED",
+                    "User fetch Unsuccess",
+                    null,
+                    AppConstants.OK,
+                    "Request Processes Successfully"
+
+            );
+            return ResponseEntity.ok(response);
         }
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<Response> getAllUsers() {
         List<UserDto> dto = this.service.getAllUsers();
         log.info("Get all Called in Controller");
-        return new ResponseEntity<List<UserDto>>(dto, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                dto,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        UserDto dto = this.service.getUserById(id);
-        return new ResponseEntity<>(dto, HttpStatusCode.valueOf(AppConstants.OK));
+    public ResponseEntity<Response> getUserById(@PathVariable Long id) {
+        UserDto userDto = service.getUserById(id);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                userDto,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.OK));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody @Valid UserDto user) {
+    public ResponseEntity<Response> updateUser(@PathVariable Long id, @RequestBody @Valid UserDto user) {
         UserDto userDto = service.updateUser(id,user);
         log.info("Update Put called in controller");
-        return new ResponseEntity<UserDto>(userDto, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User Updated successfully",
+                userDto,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
             service.deleteUser(id);
             log.info("Delete called in controller");
-            return new ResponseEntity<>(HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User deleted successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<UserResponse> getAll(
+    public ResponseEntity<Response> getAll(
             @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(value = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
             @RequestParam (value = "sortDir", defaultValue = AppConstants.SORT_DIR,required = false) String sortDir)
     {
         UserResponse users = this.service.getAllPost(pageNumber, pageSize,sortBy, sortDir);
-        return ResponseEntity.ok(users);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                users,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-name")
-    public ResponseEntity<List<UserDto>> getByName(@RequestParam String name){
+    public ResponseEntity<Response> getByName(@RequestParam String name){
         List<UserDto> allUser = this.service.getAllUserByName(name);
-        return new ResponseEntity<>(allUser, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                allUser,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-date")
-    public ResponseEntity<List<UserDto>> getByDate(){
+    public ResponseEntity<Response> getByDate(){
         log.info("Get By Date API in controller");
         List<UserDto> allUser = this.service.getAllUserByUpdatedDate();
-        return new ResponseEntity<>(allUser, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                allUser,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-start-name")
-    public ResponseEntity<List<UserDto>> getByNameStart(@RequestParam String name){
+    public ResponseEntity<Response> getByNameStart(@RequestParam String name){
         log.info("Get By Start Name Api in controller");
         List<UserDto> allUser = this.service.getAllNameStartWith(name);
-        return new ResponseEntity<>(allUser, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                allUser,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
 
     @GetMapping("/by-end-name")
-    public ResponseEntity<List<UserDto>> getByNameEnd(@RequestParam String name){
+    public ResponseEntity<Response> getByNameEnd(@RequestParam String name){
         log.info("Get By End Name Api in controller");
         List<UserDto> allUser = this.service.getAllNameEndWith(name);
-        return new ResponseEntity<>(allUser, HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                allUser,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/orderBy-name")
-    public ResponseEntity<List<UserDto>> getNameDesc(){
+    public ResponseEntity<Response> getNameDesc(){
         List<UserDto> allUser = this.service.getAllNameDesc();
-        return new ResponseEntity<>(allUser,HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User fetched successfully",
+                allUser,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/send-mail")
-    public ResponseEntity<String> sendMail(@RequestBody MailEntity mailEntity){
+    public ResponseEntity<Response> sendMail(@RequestBody MailEntity mailEntity){
         this.service.sendEmail(mailEntity);
-        return new ResponseEntity<String>("Sent Successful",HttpStatusCode.valueOf(AppConstants.OK));
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Mail sent successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        return ResponseEntity.ok(response);
     }
 
 
     @PostMapping("/send-otp")
-    public ResponseEntity<String> sendOtp(@RequestParam String toPhoneNumber) {
+    public ResponseEntity<Response> sendOtp(@RequestParam String toPhoneNumber) {
         String otp = service.generateOtp();
         boolean isSent = service.sendOtp(toPhoneNumber, otp);
 
         if (isSent) {
-            return ResponseEntity.ok("OTP sent successfully to WhatsApp number: " + toPhoneNumber);
+            Response response = Response.buildResponse(
+                    "SUCCESS",
+                    "OTP sent successfully",
+                    null,
+                    AppConstants.OK,
+                    "Request Processes Successfully"
+
+            );
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(AppConstants.INTERNAL_SERVER_ERROR).body("Failed to send OTP");
+            Response response = Response.buildResponse(
+                    "FAILED",
+                    "OTP not Sent",
+                    null,
+                    AppConstants.OK,
+                    "Request Processes Successfully"
+
+            );
+            return ResponseEntity.ok(response);
         }
     }
 
