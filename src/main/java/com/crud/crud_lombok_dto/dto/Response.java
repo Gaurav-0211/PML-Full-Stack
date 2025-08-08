@@ -2,14 +2,19 @@ package com.crud.crud_lombok_dto.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Response implements Serializable {
 
     @Serial
@@ -24,6 +29,7 @@ public class Response implements Serializable {
 
     private Object data;
 
+    @JsonProperty("response_message")
     private String response_message;
 
     private LocalDateTime timestamp;

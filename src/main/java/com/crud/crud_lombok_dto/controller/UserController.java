@@ -47,7 +47,7 @@ public class UserController {
                 "SUCCESS",
                 "User Registered successfully",
                 dto,
-                AppConstants.OK,
+                AppConstants.CREATED,
                 "Request Processes Successfully"
 
         );

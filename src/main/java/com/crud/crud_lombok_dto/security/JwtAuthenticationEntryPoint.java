@@ -1,5 +1,6 @@
 package com.crud.crud_lombok_dto.security;
 
+import com.crud.crud_lombok_dto.config.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,12 +25,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
                          AuthenticationException authException) throws IOException, ServletException {
 
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(AppConstants.SC_UNAUTHORIZED);
         response.setCharacterEncoding("UTF-8");
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("timestamp", LocalDateTime.now().toString());
-        responseBody.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        responseBody.put("status", AppConstants.SC_UNAUTHORIZED);
         responseBody.put("error", "Unauthorized");
         responseBody.put("message", "You are not authorised to make changes in db");
         responseBody.put("path", request.getRequestURI());

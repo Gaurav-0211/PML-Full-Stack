@@ -8,7 +8,7 @@ public class AppConstants {
 
 
     public static final Integer BAD_REQUEST = 400;
-    public static final Integer SC_UNAUTHORISED = 401;
+    public static final Integer SC_UNAUTHORIZED = 401;
     public static final Integer NOT_FOUND = 404;
     public static final Integer METHOD_NOT_ALLOWED = 405;
     public static final Integer CONFLICT = 409;
