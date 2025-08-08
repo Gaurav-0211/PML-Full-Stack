@@ -1,12 +1,21 @@
 package com.crud.crud_lombok_dto.controller;
 import com.crud.crud_lombok_dto.config.AppConstants;
 import com.crud.crud_lombok_dto.dto.*;
+import com.crud.crud_lombok_dto.exception.NoSuchUserExistException;
+import com.crud.crud_lombok_dto.model.User;
+import com.crud.crud_lombok_dto.repository.UserRepository;
+import com.crud.crud_lombok_dto.security.JwtTokenHelper;
 import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,6 +26,18 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenHelper jwtTokenHelper;
 
     @PostMapping("/register")
     public ResponseEntity<Response> createUser(@RequestBody @Valid UserDto userdto){
@@ -48,7 +69,6 @@ public class UserController {
                     "Request Processes Successfully"
 
             );
-
             return ResponseEntity.ok(response);
         } else {
 
@@ -259,6 +279,31 @@ public class UserController {
             );
             return ResponseEntity.ok(response);
         }
+    }
+
+
+    @PostMapping("/auth-login")
+    public ResponseEntity<String> login(@RequestBody LoginDto request) {
+
+        // 1. Authenticate credentials
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        // 2. Load UserDetails
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+
+        // 3. Get agent from DB
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new NoSuchUserExistException("User not Found"));
+
+        String token = jwtTokenHelper.generateToken(userDetails);
+
+        // 6. Return token and role in response
+        return ResponseEntity.ok(token);
     }
 
 

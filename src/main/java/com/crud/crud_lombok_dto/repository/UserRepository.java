@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(@Param("email") String email);
 
-    Optional<User> findByEmail(@Param("email") String email);
+    Optional<User> findByEmail( String email);
 
     @Query("SELECT u FROM User u WHERE u.name = :name")
     List<User> findByName(@Param("name") String name);
