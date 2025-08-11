@@ -2,11 +2,13 @@ package com.crud.crud_lombok_dto.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import io.jsonwebtoken.security.SignatureException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -48,17 +51,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             token = requestToken.substring(7);
             try {
                 username = this.tokenHelper.getUserNameFromToken(token);
-            }
-            catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT token: " + e.getMessage());
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("jwt_exception", e);
+                throw new AuthenticationServiceException("Unable to get JWT token", e);
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT token has expired: " + e.getMessage());
+                request.setAttribute("jwt_exception", e);
+                throw new AuthenticationServiceException("JWT token has expired", e);
             } catch (MalformedJwtException e) {
-                System.out.println("Invalid JWT token: " + e.getMessage());
+                request.setAttribute("jwt_exception", e);
+                throw new AuthenticationServiceException("Invalid JWT token format", e);
+            } catch (SignatureException e) {
+                request.setAttribute("jwt_exception", e);
+                throw new AuthenticationServiceException("Invalid JWT token signature", e);
+            } catch (UnsupportedJwtException e) {
+                request.setAttribute("jwt_exception", e);
+                throw new AuthenticationServiceException("Unsupported JWT token", e);
             }
         } else {
             System.out.println("JWT Token does not begin with Bearer");
         }
+
 
         // 3. Validate token and set authentication
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
