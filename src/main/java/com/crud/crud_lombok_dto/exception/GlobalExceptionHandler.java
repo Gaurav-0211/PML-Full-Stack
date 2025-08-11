@@ -98,49 +98,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<Response> handleJwtExpireJException(Exception ex, HttpServletRequest request) {
-        Response response = Response.buildResponse(
-                "FAILED",
-                ex.getMessage(),
-                null,
-                AppConstants.SC_UNAUTHORIZED,
-                "Token Expired please re-login"
-        );
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
-    }
-
-    @ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<Response> handleJwtMalformedException(Exception ex, HttpServletRequest request) {
-        Response response = Response.buildResponse(
-                "FAILED",
-                ex.getMessage(),
-                null,
-                AppConstants.SC_UNAUTHORIZED,
-                "Invalid Token Id please re-check It"
-        );
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
-    }
-
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<Response> handleJwtSignatureException(Exception ex, HttpServletRequest request) {
-        Response response = Response.buildResponse(
-                "FAILED",
-                ex.getMessage(),
-                null,
-                AppConstants.SC_UNAUTHORIZED,
-                "Invalid Jwt Token Signature");
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
-    }
-
-    @ExceptionHandler(UnsupportedJwtException.class)
-    public ResponseEntity<Response> handleJwtUnsupportedException(Exception ex, HttpServletRequest request) {
-        Response response = Response.buildResponse(
-                "FAILED",
-                ex.getMessage(),
-                null,
-                AppConstants.UNSUPPORTED,
-                "Unsupported Request");
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.UNSUPPORTED));
-    }
 }

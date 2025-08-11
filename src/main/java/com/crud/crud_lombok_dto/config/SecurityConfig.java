@@ -36,6 +36,7 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Security Bean that automatically validate api's for the users based on specified role
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -56,6 +57,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Authenticate user
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

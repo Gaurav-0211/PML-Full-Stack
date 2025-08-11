@@ -36,34 +36,42 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
         responseBody.put("timestamp", LocalDateTime.now().toString());
         responseBody.put("path", request.getRequestURI());
 
-        if (jwtException instanceof ExpiredJwtException) {
+        if (jwtException instanceof ExpiredJwtException)
+        {
             response.setStatus(AppConstants.SC_UNAUTHORIZED);
             responseBody.put("status", AppConstants.SC_UNAUTHORIZED);
             responseBody.put("error", "Token Expired");
             responseBody.put("message", "Token Expired, please re-login");
-        } else if (jwtException instanceof MalformedJwtException) {
+        }
+        else if (jwtException instanceof MalformedJwtException)
+        {
             response.setStatus(AppConstants.SC_UNAUTHORIZED);
             responseBody.put("status", AppConstants.SC_UNAUTHORIZED);
             responseBody.put("error", "Invalid Token");
             responseBody.put("message", "Invalid Token Id, please re-check it");
-        } else if (jwtException instanceof SignatureException) {
+        }
+        else if (jwtException instanceof SignatureException)
+        {
             response.setStatus(AppConstants.SC_UNAUTHORIZED);
             responseBody.put("status", AppConstants.SC_UNAUTHORIZED);
             responseBody.put("error", "Invalid Signature");
             responseBody.put("message", "Invalid Jwt Token Signature");
-        } else if (jwtException instanceof UnsupportedJwtException) {
+        }
+        else if (jwtException instanceof UnsupportedJwtException)
+        {
             response.setStatus(AppConstants.UNSUPPORTED);
             responseBody.put("status", AppConstants.UNSUPPORTED);
             responseBody.put("error", "Unsupported Token");
             responseBody.put("message", "Unsupported Request");
-        } else {
+        }
+        else
+        {
             // Fallback for other authentication failures
             response.setStatus(AppConstants.SC_UNAUTHORIZED);
             responseBody.put("status", AppConstants.SC_UNAUTHORIZED);
             responseBody.put("error", "Unauthorized");
             responseBody.put("message", "You are not authorised to make changes in db");
         }
-
         new ObjectMapper().writeValue(response.getWriter(), responseBody);
     }
 }

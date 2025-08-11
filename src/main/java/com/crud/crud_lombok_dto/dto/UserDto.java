@@ -31,5 +31,4 @@ public class UserDto {
 
     private int roleId;
 
-    private RoleDto roleDto;
 }
