@@ -15,4 +15,5 @@ public class AppConstants {
     public static final Integer OK = 200;
     public static final Integer CREATED = 201;
     public static final Integer INTERNAL_SERVER_ERROR = 500;
+    public static final Integer UNSUPPORTED = 415;
 }

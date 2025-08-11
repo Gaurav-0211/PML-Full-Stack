@@ -2,6 +2,9 @@ package com.crud.crud_lombok_dto.exception;
 
 import com.crud.crud_lombok_dto.config.AppConstants;
 import com.crud.crud_lombok_dto.dto.Response;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +12,9 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.SignatureException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -79,5 +84,63 @@ public class GlobalExceptionHandler {
                 "Data Insufficient For the Request"
         );
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Response> handleIllegalException(Exception ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.BAD_REQUEST,
+                "Illegal Argument Value"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Response> handleJwtExpireJException(Exception ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.SC_UNAUTHORIZED,
+                "Token Expired please re-login"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<Response> handleJwtMalformedException(Exception ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.SC_UNAUTHORIZED,
+                "Invalid Token Id please re-check It"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<Response> handleJwtSignatureException(Exception ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.SC_UNAUTHORIZED,
+                "Invalid Jwt Token Signature");
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
+    }
+
+    @ExceptionHandler(UnsupportedJwtException.class)
+    public ResponseEntity<Response> handleJwtUnsupportedException(Exception ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.UNSUPPORTED,
+                "Unsupported Request");
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.UNSUPPORTED));
     }
 }
