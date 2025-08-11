@@ -142,7 +142,7 @@ public class UserController {
                 "Request Processes Successfully"
 
         );
-            return ResponseEntity.ok(response);
+            return new ResponseEntity<>(HttpStatusCode.valueOf(AppConstants.OK));
     }
 
     @GetMapping
@@ -283,7 +283,7 @@ public class UserController {
 
 
     @PostMapping("/auth-login")
-    public ResponseEntity<String> login(@RequestBody LoginDto request) {
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto request) {
 
         // 1. Authenticate credentials
         Authentication authentication = authenticationManager.authenticate(
@@ -298,13 +298,21 @@ public class UserController {
 
         // 3. Get agent from DB
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NoSuchUserExistException("User not Found"));
+                .orElseThrow(() -> new NoSuchUserExistException("User not exist with the given mail Id"));
 
-        String token = jwtTokenHelper.generateToken(userDetails);
+        // 4. Compare role
+        String dbRole = user.getRole().getName().name(); // assuming enum stored in DB
+        String requestRole = request.getRole().name();
+
+        if (!dbRole.equalsIgnoreCase(requestRole)) {
+            throw new RuntimeException("Access denied: Role mismatch. You are not authorized as " + requestRole);
+        }
+
+        // 5. Generate JWT with role
+        String token = jwtTokenHelper.generateToken(userDetails, dbRole);
 
         // 6. Return token and role in response
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new JwtAuthResponse(token, dbRole));
     }
-
 
 }

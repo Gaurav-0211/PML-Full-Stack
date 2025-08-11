@@ -44,13 +44,16 @@ public class JwtTokenHelper {
         return getExpirationDateFromToken(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return doGenerateToken(userDetails.getUsername());
+    public String generateToken(UserDetails userDetails, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role",role);
+        return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    private String doGenerateToken( String subject) {
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))

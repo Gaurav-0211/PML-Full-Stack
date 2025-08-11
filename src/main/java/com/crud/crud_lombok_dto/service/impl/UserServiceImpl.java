@@ -6,7 +6,9 @@ import com.crud.crud_lombok_dto.dto.UserResponse;
 import com.crud.crud_lombok_dto.exception.NoSuchUserExistException;
 import com.crud.crud_lombok_dto.exception.NoUserExist;
 import com.crud.crud_lombok_dto.exception.UserAlreadyExistException;
+import com.crud.crud_lombok_dto.model.Role;
 import com.crud.crud_lombok_dto.model.User;
+import com.crud.crud_lombok_dto.repository.RoleRepository;
 import com.crud.crud_lombok_dto.repository.UserRepository;
 import com.crud.crud_lombok_dto.service.UserService;
 import com.twilio.rest.api.v2010.account.Message;
@@ -25,6 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -46,6 +49,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // to encode the password
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     public UserDto createUser(UserDto userDto) {
 
         if(this.repository.existsByEmail(userDto.getEmail())){
@@ -54,11 +63,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("Impl create User called ");
 
         User user = this.mapper.map(userDto,User.class);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Role role = roleRepository.findById(userDto.getRoleId()).orElseThrow(() -> new NoSuchUserExistException("No Role Found "));
+        user.setRole(role);
 
         this.repository.save(user);
-        UserDto userDto1 = this.mapper.map(user,UserDto.class);
+        return this.mapper.map(user,UserDto.class);
 
-        return userDto1;
     }
 
     public List<UserDto> getAllUsers() {
@@ -85,7 +97,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("Update user in Impl");
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
-        user.setPassword(userDetails.getPassword());
+        user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         this.repository.save(user);
         return this.mapper.map(user,UserDto.class);
     }
@@ -223,13 +235,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = repository.findByEmail(username)
-                .orElseThrow(() -> new NoSuchUserExistException("User not found"));
+                .orElseThrow(() -> new NoSuchUserExistException("User Not found with given Email Id"));
 
+        String roleName = "ROLE_" + user.getRole().getName().name(); // Properly formatted
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                List.of()
+                List.of(new SimpleGrantedAuthority(roleName))
         );
     }
 }

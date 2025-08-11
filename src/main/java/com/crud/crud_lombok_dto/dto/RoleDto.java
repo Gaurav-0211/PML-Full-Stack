@@ -1,17 +1,14 @@
 package com.crud.crud_lombok_dto.dto;
 
 import com.crud.crud_lombok_dto.config.RoleType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
-public class LoginDto {
-    private String email;
-    private String password;
-    private RoleType role;
+public class RoleDto {
+    private int id;
+    private RoleType name;
 }

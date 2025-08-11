@@ -28,4 +28,8 @@ public class UserDto {
             message = "Password must be at least 6 characters and include uppercase, lowercase, digit and special character (@, #, &)"
     )
     private String password;
+
+    private int roleId;
+
+    private RoleDto roleDto;
 }
