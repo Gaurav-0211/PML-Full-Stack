@@ -356,23 +356,10 @@ public class UserController {
     }
 
     @PatchMapping("/change-password")
-    public ResponseEntity<?> changePassword(@Valid @RequestParam String email,@Valid @RequestParam String oldPassword,@Valid @RequestParam String newPassword) {
+    public ResponseEntity<Response> changePassword(@RequestBody @Valid PasswordChangeDto passwordChangeDto) {
         log.info("Change password in controller");
 
-        if(email.isEmpty() || oldPassword.isEmpty() || newPassword.isEmpty()){
-            log.info("Change password in controller failed due to invalid input request");
-            Response response = Response.buildResponse(
-                    "FAILED",
-                    "Invalid Credentials please enter all required details",
-                    null,
-                    AppConstants.BAD_REQUEST,
-                    "Request Processes Un-Successful"
-
-            );
-            return ResponseEntity.ok(response);
-        }
-
-         this.service.changePassword(email, oldPassword, newPassword);
+         this.service.changePassword(passwordChangeDto.getEmail(), passwordChangeDto.getOldPassword(), passwordChangeDto.getNewPassword());
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "Password Changed Successfully",
