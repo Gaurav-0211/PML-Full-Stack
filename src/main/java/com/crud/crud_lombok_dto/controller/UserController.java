@@ -9,6 +9,8 @@ import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -332,8 +334,10 @@ public class UserController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
         // 3. Get agent from DB
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NoSuchUserExistException("User not exist with the given mail Id"));
+        User user = userRepository.findByEmail(request.getEmail());
+        if(user == null){
+            throw new NoSuchUserExistException("User not exist with the given mail Id");
+        }
 
         // 4. Compare role
         String dbRole = user.getRole().getName().name(); // assuming enum stored in DB
@@ -349,6 +353,36 @@ public class UserController {
         // 6. Return token and role in response
         log.info("login auth controller token generated");
         return ResponseEntity.ok(new JwtAuthResponse(token, dbRole));
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestParam String email,@Valid @RequestParam String oldPassword,@Valid @RequestParam String newPassword) {
+        log.info("Change password in controller");
+
+        if(email.isEmpty() || oldPassword.isEmpty() || newPassword.isEmpty()){
+            log.info("Change password in controller failed due to invalid input request");
+            Response response = Response.buildResponse(
+                    "FAILED",
+                    "Invalid Credentials please enter all required details",
+                    null,
+                    AppConstants.BAD_REQUEST,
+                    "Request Processes Un-Successful"
+
+            );
+            return ResponseEntity.ok(response);
+        }
+
+         this.service.changePassword(email, oldPassword, newPassword);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Password Changed Successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+
+        );
+        log.info("change password - controller executed");
+        return ResponseEntity.ok(response);
     }
 
 }

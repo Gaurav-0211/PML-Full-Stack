@@ -52,5 +52,14 @@ public interface UserService {
     // Send otp on Whatsapp using twilio
     public boolean sendOtp(String toNumber, String otp);
 
+    // Reset Password
+    //public String resetPassword(String email, String password);
+
+    // Change Password
+    public void changePassword(String email, String oldPassword, String newPassword);
+
+    // Forgot Password
+    //public String forgotPassword(String email);
+
 
 }

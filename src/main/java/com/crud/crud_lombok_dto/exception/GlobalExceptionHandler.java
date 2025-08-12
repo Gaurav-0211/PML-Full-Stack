@@ -98,4 +98,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.BAD_REQUEST));
     }
 
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<Response> InvalidPasswordException(InvalidPasswordException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.SC_UNAUTHORIZED,
+                "Entered Old Password is Incorrect"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
+    }
+
+
 }
