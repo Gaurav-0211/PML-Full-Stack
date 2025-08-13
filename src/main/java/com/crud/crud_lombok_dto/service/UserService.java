@@ -67,6 +67,9 @@ public interface UserService {
     // Update new password after otp verification
     public void addNewPassword(String email,String newPassword, String confirmPassword);
 
+    // Api To send otp on the email
+    public void sentOtpToEmail(String email);
+
 
 
 

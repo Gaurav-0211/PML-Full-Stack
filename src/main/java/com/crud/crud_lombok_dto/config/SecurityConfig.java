@@ -36,6 +36,15 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    public static final String[] PUBLIC_URLS = {
+            "/api/auth/**",
+            "/v3/api-docs/**",
+            "/v2/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/webjars/**"
+    };
+
     // Security Bean that automatically validate api's for the users based on specified role
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,9 +54,13 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.PUT,"/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN","SUPER_ADMIN","NORMAL")
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+//                        .requestMatchers(HttpMethod.PUT,"/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+//                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN","SUPER_ADMIN","NORMAL")
+                                .requestMatchers(HttpMethod.GET).permitAll()
+                                .requestMatchers(HttpMethod.DELETE).permitAll()
+                                .requestMatchers(HttpMethod.PUT).permitAll()
                         .requestMatchers(HttpMethod.POST).permitAll()
                         .requestMatchers(HttpMethod.PATCH).permitAll()
                         .anyRequest().authenticated()

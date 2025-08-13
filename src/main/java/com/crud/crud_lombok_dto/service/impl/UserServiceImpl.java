@@ -291,19 +291,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             log.info("Password changed successful in Impl");
     }
 
-    // Forgot Password Api Implementation to send otp to the email for forgot password
+    // Method to implement loose coupling for sending email
     @Override
-    public void forgotPassword(String email) {
-        log.info("forgot password in Impl");
+    public void sentOtpToEmail(String email){
         User user = this.repository.findByEmail(email);
-        if (user == null) {
-            throw new NoSuchUserExistException("No user exist with email :" + email);
+        if(user == null){
+            throw new NoSuchUserExistException("User not found with given mail id");
         }
         String otp = generateOtp();
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(fromEmailId);
-        mailMessage.setTo(user.getEmail());
+        mailMessage.setTo(email);
         mailMessage.setText("Password Reset Request");
         mailMessage.setSubject(otp);
         user.setVerificationCode(otp);
@@ -312,7 +311,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         log.info("Otp Sent Successful Impl");
         javaMailSender.send(mailMessage);
+    }
 
+    // Forgot Password Api Implementation to send otp to the email for forgot password
+    @Override
+    public void forgotPassword(String email) {
+        log.info("forgot password in Impl");
+        User user = this.repository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchUserExistException("No user exist with email :" + email);
+        }
+        sentOtpToEmail(user.getEmail());
     }
 
     // Api for verifying OTP and add new Password

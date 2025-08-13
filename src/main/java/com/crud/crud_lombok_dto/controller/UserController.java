@@ -413,5 +413,16 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
+    @PostMapping("/send-otp-email")
+    public ResponseEntity<Response> sendOtpEmail(@RequestParam String email) {
+        this.service.sentOtpToEmail(email);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "OTP Sent on Email Successful",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
 }
