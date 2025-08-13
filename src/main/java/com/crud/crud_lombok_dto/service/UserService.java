@@ -59,7 +59,12 @@ public interface UserService {
     public void changePassword(String email, String oldPassword, String newPassword);
 
     // Forgot Password
-    //public String forgotPassword(String email);
+    public void forgotPassword(String email);
+
+    // Verify OTP
+    public void verifyOtpAddPassword(String email, String otp, String newPassword, String confirmPassword);
+
+
 
 
 }

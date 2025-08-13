@@ -9,8 +9,6 @@ import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +41,7 @@ public class UserController {
 
     // Create User Controller Request
     @PostMapping("/register")
-    public ResponseEntity<Response> createUser(@RequestBody @Valid UserDto userdto){
+    public ResponseEntity<Response> createUser(@RequestBody @Valid UserDto userdto) {
         log.info("Register Api called in Controller");
         UserDto dto = this.service.createUser(userdto);
         Response response = Response.buildResponse(
@@ -127,7 +125,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateUser(@PathVariable Long id, @RequestBody @Valid UserDto user) {
         log.info("Update Put called in controller");
-        UserDto userDto = service.updateUser(id,user);
+        UserDto userDto = service.updateUser(id, user);
         log.info("Update Put called in controller");
         Response response = Response.buildResponse(
                 "SUCCESS",
@@ -145,8 +143,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         log.info("Delete called in controller");
-            service.deleteUser(id);
-            log.info("Delete called in controller");
+        service.deleteUser(id);
+        log.info("Delete called in controller");
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "User deleted successfully",
@@ -156,19 +154,18 @@ public class UserController {
 
         );
         log.info("User deleted successfully controller - Delete Request");
-            return new ResponseEntity<>(HttpStatusCode.valueOf(AppConstants.OK));
+        return new ResponseEntity<>(HttpStatusCode.valueOf(AppConstants.OK));
     }
 
     // Get all user by pagination and sorting
     @GetMapping
     public ResponseEntity<Response> getAll(
             @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-            @RequestParam(value = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
-            @RequestParam (value = "sortDir", defaultValue = AppConstants.SORT_DIR,required = false) String sortDir)
-    {
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIR, required = false) String sortDir) {
         log.info("Get All called in controller");
-        UserResponse users = this.service.getAllPost(pageNumber, pageSize,sortBy, sortDir);
+        UserResponse users = this.service.getAllPost(pageNumber, pageSize, sortBy, sortDir);
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "User fetched successfully",
@@ -183,7 +180,7 @@ public class UserController {
 
     // Get all user by full name
     @GetMapping("/by-name")
-    public ResponseEntity<Response> getByName(@RequestParam String name){
+    public ResponseEntity<Response> getByName(@RequestParam String name) {
         log.info("Get By Name Api in controller");
         List<UserDto> allUser = this.service.getAllUserByName(name);
         Response response = Response.buildResponse(
@@ -200,7 +197,7 @@ public class UserController {
 
     // Get all user by updated date
     @GetMapping("/by-date")
-    public ResponseEntity<Response> getByDate(){
+    public ResponseEntity<Response> getByDate() {
         log.info("Get user by Recent Updated in controller");
         List<UserDto> allUser = this.service.getAllUserByUpdatedDate();
         Response response = Response.buildResponse(
@@ -217,7 +214,7 @@ public class UserController {
 
     // Get all user by name starting with
     @GetMapping("/by-start-name")
-    public ResponseEntity<Response> getByNameStart(@RequestParam String name){
+    public ResponseEntity<Response> getByNameStart(@RequestParam String name) {
         log.info("Get By Start Name Api in controller");
         List<UserDto> allUser = this.service.getAllNameStartWith(name);
         Response response = Response.buildResponse(
@@ -235,7 +232,7 @@ public class UserController {
 
     // Get all user by name Ending with
     @GetMapping("/by-end-name")
-    public ResponseEntity<Response> getByNameEnd(@RequestParam String name){
+    public ResponseEntity<Response> getByNameEnd(@RequestParam String name) {
         log.info("Get By End Name Api in controller");
         List<UserDto> allUser = this.service.getAllNameEndWith(name);
         Response response = Response.buildResponse(
@@ -252,7 +249,7 @@ public class UserController {
 
     // Get all user Order By name Desc
     @GetMapping("/orderBy-name")
-    public ResponseEntity<Response> getNameDesc(){
+    public ResponseEntity<Response> getNameDesc() {
         log.info("Get By Name Order By Descending");
         List<UserDto> allUser = this.service.getAllNameDesc();
         Response response = Response.buildResponse(
@@ -269,7 +266,7 @@ public class UserController {
 
     // Sent email to any user
     @PostMapping("/send-mail")
-    public ResponseEntity<Response> sendMail(@RequestBody MailEntity mailEntity){
+    public ResponseEntity<Response> sendMail(@RequestBody MailEntity mailEntity) {
         log.info("Sending mail in controller");
         this.service.sendEmail(mailEntity);
         Response response = Response.buildResponse(
@@ -335,7 +332,7 @@ public class UserController {
 
         // 3. Get agent from DB
         User user = userRepository.findByEmail(request.getEmail());
-        if(user == null){
+        if (user == null) {
             throw new NoSuchUserExistException("User not exist with the given mail Id");
         }
 
@@ -355,11 +352,12 @@ public class UserController {
         return ResponseEntity.ok(new JwtAuthResponse(token, dbRole));
     }
 
+    // Change Password when user is logged in and changing it from internal application
     @PatchMapping("/change-password")
     public ResponseEntity<Response> changePassword(@RequestBody @Valid PasswordChangeDto passwordChangeDto) {
         log.info("Change password in controller");
 
-         this.service.changePassword(passwordChangeDto.getEmail(), passwordChangeDto.getOldPassword(), passwordChangeDto.getNewPassword());
+        this.service.changePassword(passwordChangeDto.getEmail(), passwordChangeDto.getOldPassword(), passwordChangeDto.getNewPassword());
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "Password Changed Successfully",
@@ -372,4 +370,32 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // Forgot password Initiate and sent otp to the email
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Response> forgotPassword(@RequestParam String email) {
+        log.info("Forgot password in controller");
+        this.service.forgotPassword(email);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "OTP sent successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    // Verify OTP sent to the user email ID and add new password
+    @PostMapping("/verify-otp-add-password")
+    public ResponseEntity<Response> verifyOTPAddPassword(@RequestBody ForgotPasswordDto forgotPasswordDto) {
+        this.service.verifyOtpAddPassword(forgotPasswordDto.getEmail(), forgotPasswordDto.getOtp(), forgotPasswordDto.getNewPassword(), forgotPasswordDto.getConfirmPassword());
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "User Verified Successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
 }

@@ -110,5 +110,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.SC_UNAUTHORIZED));
     }
 
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<Response> InvalidOtpException(InvalidOtpException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "FAILED",
+                ex.getMessage(),
+                null,
+                AppConstants.NOT_FOUND,
+                "Entered Otp is Incorrect"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
+    }
 
 }

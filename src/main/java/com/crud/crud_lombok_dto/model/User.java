@@ -1,6 +1,7 @@
 package com.crud.crud_lombok_dto.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -41,5 +42,9 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    private String verificationCode;
+
+    LocalDateTime  verificationCodeExpiryTime;
 
 }

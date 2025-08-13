@@ -3,10 +3,7 @@ package com.crud.crud_lombok_dto.service.impl;
 import com.crud.crud_lombok_dto.dto.MailEntity;
 import com.crud.crud_lombok_dto.dto.UserDto;
 import com.crud.crud_lombok_dto.dto.UserResponse;
-import com.crud.crud_lombok_dto.exception.InvalidPasswordException;
-import com.crud.crud_lombok_dto.exception.NoSuchUserExistException;
-import com.crud.crud_lombok_dto.exception.NoUserExist;
-import com.crud.crud_lombok_dto.exception.UserAlreadyExistException;
+import com.crud.crud_lombok_dto.exception.*;
 import com.crud.crud_lombok_dto.model.Role;
 import com.crud.crud_lombok_dto.model.User;
 import com.crud.crud_lombok_dto.repository.RoleRepository;
@@ -32,9 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 @Slf4j
@@ -292,6 +289,71 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setPassword(passwordEncoder.encode(newPassword));
             this.repository.save(user);
             log.info("Password changed successful in Impl");
+    }
+
+    // Forgot Password Api Implementation to send otp to the email for forgot password
+    @Override
+    public void forgotPassword(String email) {
+        log.info("forgot password in Impl");
+        User user = this.repository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchUserExistException("No user exist with email :" + email);
+        }
+        String otp = generateOtp();
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(fromEmailId);
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setText("Password Reset Request");
+        mailMessage.setSubject(otp);
+        user.setVerificationCode(otp);
+        user.setVerificationCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
+        this.repository.save(user);
+
+        log.info("Otp Sent Successful Impl");
+        javaMailSender.send(mailMessage);
+
+    }
+
+    // Api for verifying OTP and add new Password
+    @Override
+    public void verifyOtpAddPassword(String email, String otp, String newPassword, String confirmPassword) {
+        log.info("Otp Verification in Impl- verifyOtpAddPassword");
+        User user = this.repository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchUserExistException("No user exist with email : " + email);
+        }
+
+        if (otp == null || otp.length() != 6) {
+            throw new InvalidOtpException("Please Enter correct otp");
+        }
+        log.info("OTP format is good service Impl- verifyOtp");
+
+        if(!newPassword.equals(confirmPassword)){
+            throw new InvalidPasswordException("Password and Confirm Password does not match");
+        }
+
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new InvalidPasswordException("New password cannot be same as old password");
+        }
+
+        log.info("Password Format is good - Impl verifyOtp");
+
+        if (user.getVerificationCode() != null
+                && user.getVerificationCodeExpiryTime() != null
+                && user.getVerificationCode().equals(otp)
+                && user.getVerificationCodeExpiryTime().isAfter(LocalDateTime.now())) {
+            user.setVerificationCode(null);
+            user.setVerificationCodeExpiryTime(null);
+            this.repository.save(user);
+        } else {
+            throw new InvalidOtpException("Invalid OTP or OTP expired");
+        }
+        log.info("OTP Successfully verified - Impl verifyOtp");
+        user.setPassword(passwordEncoder.encode(newPassword));
+        log.info("Password fetched and updated Impl - verifyOtp");
+        this.repository.save(user);
     }
 
     @Override
