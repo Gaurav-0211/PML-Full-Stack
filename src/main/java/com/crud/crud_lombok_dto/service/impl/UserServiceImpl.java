@@ -317,7 +317,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     // Api for verifying OTP and add new Password
     @Override
-    public void verifyOtpAddPassword(String email, String otp, String newPassword, String confirmPassword) {
+    public void verifyOtp(String email, String otp) {
         log.info("Otp Verification in Impl- verifyOtpAddPassword");
         User user = this.repository.findByEmail(email);
         if (user == null) {
@@ -327,18 +327,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (otp == null || otp.length() != 6) {
             throw new InvalidOtpException("Please Enter correct otp");
         }
-        log.info("OTP format is good service Impl- verifyOtp");
-
-        if(!newPassword.equals(confirmPassword)){
-            throw new InvalidPasswordException("Password and Confirm Password does not match");
-        }
-
-
-        if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new InvalidPasswordException("New password cannot be same as old password");
-        }
-
-        log.info("Password Format is good - Impl verifyOtp");
+        log.info("OTP format is good. service Impl- verifyOtp");
 
         if (user.getVerificationCode() != null
                 && user.getVerificationCodeExpiryTime() != null
@@ -351,9 +340,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new InvalidOtpException("Invalid OTP or OTP expired");
         }
         log.info("OTP Successfully verified - Impl verifyOtp");
+    }
+
+    @Override
+    public void addNewPassword(String email, String newPassword, String confirmPassword){
+        User user = this.repository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchUserExistException("No user exist with email : " + email);
+        }
+
+        if(!newPassword.equals(confirmPassword)){
+            throw new InvalidPasswordException("Password and Confirm Password does not match");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new InvalidPasswordException("New password cannot be same as old password");
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         log.info("Password fetched and updated Impl - verifyOtp");
         this.repository.save(user);
+
     }
 
     @Override

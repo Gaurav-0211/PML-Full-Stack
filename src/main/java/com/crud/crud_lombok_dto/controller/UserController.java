@@ -385,10 +385,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // Verify OTP sent to the user email ID and add new password
-    @PostMapping("/verify-otp-add-password")
-    public ResponseEntity<Response> verifyOTPAddPassword(@RequestBody ForgotPasswordDto forgotPasswordDto) {
-        this.service.verifyOtpAddPassword(forgotPasswordDto.getEmail(), forgotPasswordDto.getOtp(), forgotPasswordDto.getNewPassword(), forgotPasswordDto.getConfirmPassword());
+    // Verify OTP which will sent on user email
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Response> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+        this.service.verifyOtp(email, otp);
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "User Verified Successfully",
@@ -398,4 +398,20 @@ public class UserController {
         );
         return ResponseEntity.ok(response);
     }
+
+    // Add new Password for forgot
+    @PostMapping("/add-new-password")
+    public ResponseEntity<Response> addNewPwd(@RequestBody ForgotPasswordDto forgotPasswordDto) {
+        this.service.addNewPassword(forgotPasswordDto.getEmail(), forgotPasswordDto.getNewPassword(), forgotPasswordDto.getConfirmPassword());
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "New Password Updated Successfully",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
 }

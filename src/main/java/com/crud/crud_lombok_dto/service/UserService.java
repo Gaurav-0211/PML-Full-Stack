@@ -61,8 +61,11 @@ public interface UserService {
     // Forgot Password
     public void forgotPassword(String email);
 
-    // Verify OTP
-    public void verifyOtpAddPassword(String email, String otp, String newPassword, String confirmPassword);
+    // Verify OTP to forgot password
+    public void verifyOtp(String email,String otp);
+
+    // Update new password after otp verification
+    public void addNewPassword(String email,String newPassword, String confirmPassword);
 
 
 
