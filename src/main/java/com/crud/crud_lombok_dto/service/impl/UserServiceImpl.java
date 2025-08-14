@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
-    private final Integer LOCK_TIME = 10;
+    private final Integer LOCK_TIME = 5;
 
     private final Integer MAX_ATTEMPTS = 3;
 
