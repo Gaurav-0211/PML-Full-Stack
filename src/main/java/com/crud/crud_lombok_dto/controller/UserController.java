@@ -63,8 +63,10 @@ public class UserController {
 
         boolean isValid = service.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
+        log.info("User got verified ");
+        Response response;
         if (isValid) {
-            Response response = Response.buildResponse(
+            response = Response.buildResponse(
                     "SUCCESS",
                     "User Login successfully",
                     null,
@@ -72,10 +74,9 @@ public class UserController {
                     "Request Processes Successfully"
 
             );
-            return ResponseEntity.ok(response);
         } else {
 
-            Response response = Response.buildResponse(
+            response = Response.buildResponse(
                     "FAILED",
                     "User fetch Unsuccess",
                     null,
@@ -83,8 +84,8 @@ public class UserController {
                     "Request Processes Successfully"
 
             );
-            return ResponseEntity.ok(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     // Get all user request without pagination and sorting

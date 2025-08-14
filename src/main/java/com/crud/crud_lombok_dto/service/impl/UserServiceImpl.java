@@ -54,6 +54,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
+    private final Integer LOCK_TIME = 10;
+
+    private final Integer MAX_ATTEMPTS = 3;
+
+    private final Integer OTP_VALID_DURATION = 5;
+
+
     // Application Start here Register for the first time
     public UserDto createUser(UserDto userDto) {
 
@@ -125,14 +132,42 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     // Validate User while login from mail and password
     @Override
     public boolean validateUser(String email, String password) {
-
-        log.info("Validate user in Impl");
+        log.info("Validate user in Impl- Service");
         User user = repository.findByEmail(email);
         if (user == null) {
             return false;
         }
 
-        return user.getPassword().equals(password);
+        // Checking if account is locked or not
+        if (user.getAccountLockedUntil() != null && LocalDateTime.now().isBefore(user.getAccountLockedUntil())) {
+            long secondsRemaining = java.time.Duration.between(LocalDateTime.now(), user.getAccountLockedUntil()).getSeconds();
+            throw new TimeLimitException("Account is locked. Please wait " + secondsRemaining + " seconds before trying again.");
+        }
+        log.info("User is not Locked now password and mail will get verified");
+
+        if (passwordEncoder.matches(password, user.getPassword()) && user.getAccountLockedUntil() == null
+                && user.getFailedLoginAttempts() <= MAX_ATTEMPTS) {
+            // Reset failed attempts after successful login
+            user.setFailedLoginAttempts(0);
+            user.setAccountLockedUntil(null);
+            repository.save(user);
+            return true;
+        } else {
+            // Increment failed attempts
+            int newAttempts = user.getFailedLoginAttempts() + 1;
+            user.setFailedLoginAttempts(newAttempts);
+
+            // Lock account if more than 3 attempts
+            if (newAttempts > MAX_ATTEMPTS) {
+                user.setAccountLockedUntil(LocalDateTime.now().plusMinutes(LOCK_TIME));
+                repository.save(user);
+                log.info("User get locked for  10 minute due to invalid credentials");
+                throw new TimeLimitException("Too many failed attempts. Account locked for 10 minutes.");
+            }
+
+            repository.save(user);
+            return false;
+        }
     }
 
     // Get all post by paging api implemented
@@ -254,7 +289,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
 
-    // Method to send OTP
+    // Method to send OTP on Whatsapp
     public boolean sendOtp(String toNumber, String otp) {
         log.info("Sent Otp method call in Impl");
         try {
@@ -283,7 +318,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new InvalidPasswordException("Invalid old password");}
-        if (oldPassword.equals(newPassword)) {
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new InvalidPasswordException("New password cannot be same as old password");
         }
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -293,25 +329,38 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     // Method to implement loose coupling for sending email
     @Override
-    public void sentOtpToEmail(String email){
+    public void sentOtpToEmail(String email) {
         User user = this.repository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             throw new NoSuchUserExistException("User not found with given mail id");
         }
+
+        // Checking if an OTP was already sent and not expired
+        if (user.getVerificationCode() != null &&
+                user.getVerificationCodeExpiryTime() != null &&
+                LocalDateTime.now().isBefore(user.getVerificationCodeExpiryTime())) {
+
+            long secondsRemaining = java.time.Duration.between(LocalDateTime.now(), user.getVerificationCodeExpiryTime()).getSeconds();
+            throw new TimeLimitException("OTP already sent. Please wait " + secondsRemaining + " seconds before requesting a new one.");
+        }
+
         String otp = generateOtp();
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(fromEmailId);
         mailMessage.setTo(email);
-        mailMessage.setText("Password Reset Request");
-        mailMessage.setSubject(otp);
+        mailMessage.setText("Your OTP for password reset is: " + otp);
+        mailMessage.setSubject("Password Reset Request");
+
+        // Save OTP with expiry
         user.setVerificationCode(otp);
-        user.setVerificationCodeExpiryTime(LocalDateTime.now().plusMinutes(5));
+        user.setVerificationCodeExpiryTime(LocalDateTime.now().plusMinutes(OTP_VALID_DURATION));
         this.repository.save(user);
 
-        log.info("Otp Sent Successful Impl");
+        log.info("Otp Sent Successfully");
         javaMailSender.send(mailMessage);
     }
+
 
     // Forgot Password Api Implementation to send otp to the email for forgot password
     @Override
@@ -321,6 +370,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user == null) {
             throw new NoSuchUserExistException("No user exist with email :" + email);
         }
+        // Calling api to send otp to particular email
         sentOtpToEmail(user.getEmail());
     }
 
@@ -338,6 +388,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         log.info("OTP format is good. service Impl- verifyOtp");
 
+        // check otp and mark expiry and otp null to database
         if (user.getVerificationCode() != null
                 && user.getVerificationCodeExpiryTime() != null
                 && user.getVerificationCode().equals(otp)
@@ -351,6 +402,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("OTP Successfully verified - Impl verifyOtp");
     }
 
+    // After verifying OTP add new password
     @Override
     public void addNewPassword(String email, String newPassword, String confirmPassword){
         User user = this.repository.findByEmail(email);
@@ -358,10 +410,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new NoSuchUserExistException("No user exist with email : " + email);
         }
 
+        // Check if new password is not equal to new Confirm password
         if(!newPassword.equals(confirmPassword)){
             throw new InvalidPasswordException("Password and Confirm Password does not match");
         }
 
+        // Matching old password with new password
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new InvalidPasswordException("New password cannot be same as old password");
         }

@@ -47,4 +47,9 @@ public class User {
 
     LocalDateTime  verificationCodeExpiryTime;
 
+    private int failedLoginAttempts;
+
+    private LocalDateTime accountLockedUntil;
+
+
 }

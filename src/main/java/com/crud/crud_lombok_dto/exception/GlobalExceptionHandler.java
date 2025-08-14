@@ -122,4 +122,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.NOT_FOUND));
     }
 
+    @ExceptionHandler(TimeLimitException.class)
+    public ResponseEntity<Response> TimeLimitException(TimeLimitException ex, HttpServletRequest request) {
+        Response response = Response.buildResponse(
+                "WAIT",
+                ex.getMessage(),
+                null,
+                AppConstants.CONFLICT,
+                "Please wait for some time before reattempt"
+        );
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(AppConstants.CONFLICT));
+    }
+
 }
