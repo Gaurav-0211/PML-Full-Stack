@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final Integer OTP_VALID_DURATION = 5;
 
+    private final Integer TOKEN_VALIDATION_MINUTES = 10;
 
     // Application Start here Register for the first time
     public UserDto createUser(UserDto userDto) {
@@ -458,14 +459,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         // Acknowledge of resending link again within 5 minutes
         if (user.getLastResetLinkSentAt() != null &&
-                LocalDateTime.now().isBefore(user.getLastResetLinkSentAt().plusMinutes(5))) {
+                LocalDateTime.now().isBefore(user.getLastResetLinkSentAt().plusMinutes(LOCK_TIME))) {
             throw new TimeLimitException("You can request another reset link after 5 minutes.");
         }
 
         // Generate token and expiry of the link
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
-        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(TOKEN_VALIDATION_MINUTES));
         user.setLastResetLinkSentAt(LocalDateTime.now());
         repository.save(user);
 
@@ -484,8 +485,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(fromEmailId);
         mailMessage.setTo(email);
-        mailMessage.setText("Reset Password Link" );
-        mailMessage.setSubject("Please Click on the link to reset your password : "+ resetLink );
+        mailMessage.setText("Please Click on the link to reset your password : "+ resetLink );
+        mailMessage.setSubject("Reset Password Link" );
 
         log.info("Verification Link Sent Successful");
         javaMailSender.send(mailMessage);
