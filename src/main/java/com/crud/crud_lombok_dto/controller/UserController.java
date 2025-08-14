@@ -426,4 +426,35 @@ public class UserController {
         );
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/send-email-link")
+    public ResponseEntity<Response> sendLinkEmail(@RequestParam String email) {
+        this.service.sendVerificationLink(email);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "Reset Link Sent on Email Successful",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password-link")
+    public ResponseEntity<Response> forgotPasswordWithLink(@RequestParam String token,
+                                                           @RequestParam String newPassword,
+                                                           @RequestParam String confirmPassword) {
+        this.service.changeNewPassword(token,newPassword,confirmPassword);
+        Response response = Response.buildResponse(
+                "SUCCESS",
+                "New Password updated Successful",
+                null,
+                AppConstants.OK,
+                "Request Processes Successfully"
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

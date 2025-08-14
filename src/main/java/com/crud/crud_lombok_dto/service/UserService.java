@@ -70,6 +70,13 @@ public interface UserService {
     // Api To send otp on the email
     public void sentOtpToEmail(String email);
 
+    // Api to forgot password by sending verification link
+    public void sendVerificationLink(String email);
+
+    //change password after link verification
+    public void changeNewPassword(String token, String newPassword, String confirmPassword);
+
+
 
 
 

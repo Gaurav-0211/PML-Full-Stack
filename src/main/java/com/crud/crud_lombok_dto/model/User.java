@@ -43,13 +43,22 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    // Below two ids for sending otp
     private String verificationCode;
 
     LocalDateTime  verificationCodeExpiryTime;
 
+    // Below two is to track login attempts and lock login
     private int failedLoginAttempts;
 
     private LocalDateTime accountLockedUntil;
+
+    // Below three is for sending and validating link to forgot password while sending a link on mail
+    private String resetToken;
+
+    private LocalDateTime resetTokenExpiry;
+
+    private LocalDateTime lastResetLinkSentAt;
 
 
 }

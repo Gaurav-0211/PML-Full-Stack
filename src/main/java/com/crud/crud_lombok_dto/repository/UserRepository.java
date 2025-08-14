@@ -30,4 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u ORDER BY updatedAt DESC")
     List<User> findAllByOrderByUpdatedAtDesc();
+
+    User findByResetToken(String resetToken);
+
 }

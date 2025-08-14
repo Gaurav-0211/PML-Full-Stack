@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                          .requestMatchers(PUBLIC_URLS).permitAll()
 //                        .requestMatchers(HttpMethod.PUT,"/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
 //                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN","SUPER_ADMIN")
 //                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN","SUPER_ADMIN","NORMAL")

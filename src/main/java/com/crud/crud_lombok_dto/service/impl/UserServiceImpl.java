@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -361,7 +362,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         javaMailSender.send(mailMessage);
     }
 
-
     // Forgot Password Api Implementation to send otp to the email for forgot password
     @Override
     public void forgotPassword(String email) {
@@ -444,5 +444,78 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user1.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority(roleName))
         );
+    }
+
+
+    //  ** FORGOT PASSWORD THROUGH VERIFICATION LINK **
+    // API to send forgot link on email
+    @Override
+    public void sendVerificationLink(String email) {
+        User user = repository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchUserExistException("No user exist with email: " + email);
+        }
+
+        // Acknowledge of resending link again within 5 minutes
+        if (user.getLastResetLinkSentAt() != null &&
+                LocalDateTime.now().isBefore(user.getLastResetLinkSentAt().plusMinutes(5))) {
+            throw new TimeLimitException("You can request another reset link after 5 minutes.");
+        }
+
+        // Generate token and expiry of the link
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
+        user.setLastResetLinkSentAt(LocalDateTime.now());
+        repository.save(user);
+
+        // Reset link points to backend endpoint directly
+        String resetLink = "http://localhost:8080/api/users/resetPassword?token=" + token;
+
+        // Send email
+        sendEmailLink(email, resetLink);
+
+        log.info("Password reset link sent to {} ", email);
+    }
+
+    // Method to Send email
+    private void sendEmailLink(String email, String resetLink){
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(fromEmailId);
+        mailMessage.setTo(email);
+        mailMessage.setText("Reset Password Link" );
+        mailMessage.setSubject("Please Click on the link to reset your password : "+ resetLink );
+
+        log.info("Verification Link Sent Successful");
+        javaMailSender.send(mailMessage);
+    }
+
+    // AFTER taping on the link User Will Redirect to this api
+    @Override
+    public void changeNewPassword(String token, String newPassword, String confirmPassword) {
+        User user = this.repository.findByResetToken(token);
+        if (user == null) {
+            throw new RuntimeException("Invalid reset link.");
+        }
+
+        if (user.getResetTokenExpiry() == null || LocalDateTime.now().isAfter(user.getResetTokenExpiry())) {
+            throw new TimeLimitException("Reset link has expired. Please request a new one.");
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            throw new InvalidPasswordException("Password and Confirm Password do not match");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new InvalidPasswordException("New password cannot be the same as the old password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null); // clear token so it can't be reused
+        user.setResetTokenExpiry(null);
+        repository.save(user);
+
+        log.info("Password successfully updated for {}", user.getEmail());
     }
 }
