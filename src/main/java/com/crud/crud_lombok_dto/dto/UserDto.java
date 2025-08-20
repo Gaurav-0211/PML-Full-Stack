@@ -29,6 +29,6 @@ public class UserDto {
     )
     private String password;
 
-    private int roleId;
+    private int roleId = 4;
 
 }

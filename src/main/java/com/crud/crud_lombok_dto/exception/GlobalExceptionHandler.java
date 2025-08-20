@@ -2,9 +2,6 @@ package com.crud.crud_lombok_dto.exception;
 
 import com.crud.crud_lombok_dto.config.AppConstants;
 import com.crud.crud_lombok_dto.dto.Response;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +9,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.SignatureException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice

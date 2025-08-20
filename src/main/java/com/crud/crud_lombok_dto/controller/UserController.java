@@ -9,6 +9,7 @@ import com.crud.crud_lombok_dto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -80,12 +81,12 @@ public class UserController {
                     "FAILED",
                     "User fetch Unsuccess",
                     null,
-                    AppConstants.OK,
+                    AppConstants.SC_UNAUTHORIZED,
                     "Request Processes Successfully"
 
             );
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     // Get all user request without pagination and sorting
@@ -442,9 +443,8 @@ public class UserController {
 
     @PostMapping("/forgot-password-link")
     public ResponseEntity<Response> forgotPasswordWithLink(@RequestParam String token,
-                                                           @RequestParam String newPassword,
-                                                           @RequestParam String confirmPassword) {
-        this.service.changeNewPassword(token,newPassword,confirmPassword);
+                                                           @RequestBody ResetPasswordRequest request) {
+        this.service.changeNewPassword(token, request.getNewPassword(), request.getConfirmPassword());
         Response response = Response.buildResponse(
                 "SUCCESS",
                 "New Password updated Successful",

@@ -134,21 +134,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     // Validate User while login from mail and password
     @Override
     public boolean validateUser(String email, String password) {
-        log.info("Validate user in Impl- Service");
+        log.info("Validate(Login) user in Impl- Service");
         User user = repository.findByEmail(email);
         if (user == null) {
             return false;
         }
 
-        // Checking if account is locked or not
-        if (user.getAccountLockedUntil() != null && LocalDateTime.now().isBefore(user.getAccountLockedUntil())) {
-            long secondsRemaining = java.time.Duration.between(LocalDateTime.now(), user.getAccountLockedUntil()).getSeconds();
-            throw new TimeLimitException("Account is locked. Please wait " + secondsRemaining + " seconds before trying again.");
+        // Check if account lock expired
+        if (user.getAccountLockedUntil() != null) {
+            if (LocalDateTime.now().isAfter(user.getAccountLockedUntil())) {
+                // Lock expired → reset fields
+                user.setAccountLockedUntil(null);
+                user.setFailedLoginAttempts(0);
+                repository.save(user);
+                log.info("Lock expired → reset failed attempts and unlock account");
+            } else {
+                // If Still locked
+                long secondsRemaining = java.time.Duration
+                        .between(LocalDateTime.now(), user.getAccountLockedUntil())
+                        .getSeconds();
+                throw new TimeLimitException("Account is locked. Please wait "
+                        + secondsRemaining + " seconds before trying again.");
+            }
         }
-        log.info("User is not Locked now password and mail will get verified");
 
-        if (passwordEncoder.matches(password, user.getPassword()) && user.getAccountLockedUntil() == null
-                && user.getFailedLoginAttempts() <= MAX_ATTEMPTS) {
+        log.info("User is not locked, validating credentials");
+
+        if (passwordEncoder.matches(password, user.getPassword())) {
             // Reset failed attempts after successful login
             user.setFailedLoginAttempts(0);
             user.setAccountLockedUntil(null);
@@ -159,12 +171,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             int newAttempts = user.getFailedLoginAttempts() + 1;
             user.setFailedLoginAttempts(newAttempts);
 
-            // Lock account if more than 3 attempts
             if (newAttempts > MAX_ATTEMPTS) {
                 user.setAccountLockedUntil(LocalDateTime.now().plusMinutes(LOCK_TIME));
                 repository.save(user);
-                log.info("User get locked for  10 minute due to invalid credentials");
-                throw new TimeLimitException("Too many failed attempts. Account locked for 10 minutes.");
+                log.info("User locked for " + LOCK_TIME + " minutes due to invalid credentials");
+                throw new TimeLimitException("Too many failed attempts. Account locked for "
+                        + LOCK_TIME + " minutes.");
             }
 
             repository.save(user);
@@ -470,8 +482,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setLastResetLinkSentAt(LocalDateTime.now());
         repository.save(user);
 
-        // Reset link points to backend endpoint directly
-        String resetLink = "http://localhost:8080/api/users/resetPassword?token=" + token;
+        // Reset link point to forgot react page where user will add new password and confirm password
+        String resetLink = "http://localhost:5173/forgot-password-link?token=" + token;
 
         // Send email
         sendEmailLink(email, resetLink);
@@ -497,7 +509,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void changeNewPassword(String token, String newPassword, String confirmPassword) {
         User user = this.repository.findByResetToken(token);
         if (user == null) {
-            throw new RuntimeException("Invalid reset link.");
+            throw new NoSuchUserExistException("Invalid reset link.");
         }
 
         if (user.getResetTokenExpiry() == null || LocalDateTime.now().isAfter(user.getResetTokenExpiry())) {
