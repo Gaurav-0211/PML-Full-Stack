@@ -1,5 +1,6 @@
 package com.crud.crud_lombok_dto.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class UserDto {
             regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#&]).{6,}$",
             message = "Password must be at least 6 characters and include uppercase, lowercase, digit and special character (@, #, &)"
     )
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private int roleId = 4;
